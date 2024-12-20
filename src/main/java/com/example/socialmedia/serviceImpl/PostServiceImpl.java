@@ -3,6 +3,7 @@ package com.example.socialmedia.serviceImpl;
 import com.example.socialmedia.entity.Notification;
 import com.example.socialmedia.entity.Post;
 import com.example.socialmedia.entity.UserInfo;
+import com.example.socialmedia.exception.UserException;
 import com.example.socialmedia.repository.PostRepository;
 import com.example.socialmedia.repository.UserRepository;
 import com.example.socialmedia.service.PostService;
@@ -25,8 +26,33 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post addPost(Post post,Integer userId) {
+        String ex;
+
+        try{
+            if(userId==null){
+                ex="please enter userId";
+                throw new UserException(ex);
+            } else if (post==null) {
+                ex="please enter post data";
+                throw new UserException(ex);
+            } else if (post.getpContent()==null) {
+                ex="Post content not found";
+                throw new UserException(ex);
+            }
+        }catch (Exception e){
+            System.out.println("Exception Occured :"+e.toString());
+        }
 
         Optional<UserInfo> userInfoTemp=userRepository.findById(userId);
+        try{
+            if(userInfoTemp.get()==null){
+                ex="User Not Found !!";
+                throw new UserException(ex);
+            }
+        }catch (Exception e){
+            System.out.println("Exception Occured :"+e.toString());
+        }
+
 
         post.setUser(userInfoTemp.get());
 
@@ -37,7 +63,27 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post likePost(Integer postId, Integer userId) {
 
+        String ex;
+        try{
+            if(postId==null){
+                ex="Please enter post id";
+                throw new UserException(ex);
+            }
+        }catch (Exception e){
+            System.out.println("Exception Occured :"+e.toString());
+        }
+
         Optional<Post> postTemp=postRepository.findById(postId);
+
+        try{
+            if(postTemp.get()==null){
+                ex="Post not Found !";
+                throw new UserException(ex);
+            }
+        }catch (Exception e){
+            System.out.println("Exception Occured :"+e.toString());
+        }
+
 
         postTemp.get().setLikes(postTemp.get().getLikes() + 1);
         Post postResult= postRepository.save(postTemp.get());
